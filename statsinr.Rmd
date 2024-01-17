@@ -1,0 +1,698 @@
+---
+title: "igj"
+author: "Peter"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+
+```{r}
+amir_deals <- readRDS("/Users/peterdunson/Downloads/seller_1.rds")
+world_happiness_sugar <- readRDS("/Users/peterdunson/Downloads/world_happiness_sugar.rds")
+```
+
+
+```{r}
+food_consumption
+```
+
+
+```{r}
+belgium_consumption <- food_consumption %>%
+  filter(country == "Belgium")
+```
+
+```{r}
+usa_consumption <- food_consumption %>%
+  filter(country == "USA")
+```
+
+```{r}
+mean(belgium_consumption$consumption)
+median(belgium_consumption$consumption)
+```
+
+```{r}
+mean(usa_consumption$consumption)
+median(usa_consumption$consumption)
+```
+
+```{r}
+food_consumption %>%
+  filter(country %in% c("Belgium", "USA")) %>%
+  group_by(country) %>%
+  summarize(mean_consumption = mean(consumption), median_consumption = median(consumption))
+```
+
+```{r}
+food_consumption %>%
+  filter(food_category == "rice")
+```
+
+
+```{r}
+food_consumption %>%
+  filter(food_category == "rice")
+```
+
+```{r}
+ggplot(food_consumption, aes(x = co2_emission)) +
+  geom_histogram() #didnt work how it was supposed to, added the df, aes(x = var) and worked
+```
+
+```{r}
+food_consumption %>%
+  filter(food_category == "rice") %>%
+  summarize(mean_co2 = mean(co2_emission), median_co2 = median(co2_emission))
+```
+
+```{r}
+dists <- msleep$sleep_total - mean(msleep$sleep_total)
+dists
+```
+
+```{r}
+squared_dists <- (dists)^2
+```
+
+```{r}
+sum_sq_dists <- sum(squared_dists)
+sum_sq_dists
+```
+
+```{r}
+sum_sq_dists/82 #n-1
+```
+
+```{r}
+var(msleep$sleep_total) #one funciton, variability
+```
+
+```{r}
+sqrt(var(msleep$sleep_total)) #standard deviation
+sd(msleep$sleep_total) #or LITERALLY JUST THIS, DUMB BITCH
+```
+
+```{r}
+mean(abs(dists)) #mean absolute deviation, SD penalizes longer distances more than shorter, MAD penalizes distances equally
+```
+
+```{r}
+quantile(msleep$sleep_total) #quartiles
+```
+
+```{r}
+ggplot(msleep, aes(y = sleep_total)) +
+  geom_boxplot()
+```
+
+```{r}
+quantile(msleep$sleep_total, probs = c(0, 0.2, 0.4, 0.6, 0.8, 1)) #quantiles
+```
+
+```{r}
+quantile(msleep$sleep_total, probs = seq(0, 1, 0.2)) #same as above
+```
+
+```{r}
+quantile(msleep$sleep_total, .75) - quantile(msleep$sleep_total, .25) #IQR
+```
+
+```{r}
+iqr <- quantile(msleep$bodywt, .75) - quantile(msleep$bodywt, .25)
+lower_threshold <- quantile(msleep$bodywt, .25) - 1.5 * iqr
+upper_threshold <- quantile(msleep$bodywt, .75) + 1.5 * iqr
+```
+
+```{r}
+msleep %>% filter(bodywt < lower_threshold | bodywt > upper_threshold) %>% #note the odd use of "|" between things, cant be replaced with a comma...
+  select(name, vore, sleep_total, bodywt)
+```
+
+
+```{r}
+msleep
+```
+
+```{r}
+quantile(food_consumption$co2_emission) #df first, then column name
+```
+
+```{r}
+quantile(food_consumption$co2_emission, probs = seq(0, 1, .2))
+```
+
+```{r}
+quantile(food_consumption$co2_emission, probs = seq(0, 1, .1))
+```
+
+```{r}
+food_consumption %>%
+  group_by(food_category) %>%
+  summarize(var_co2 = var(co2_emission), sd_co2 = sd(co2_emission))
+```
+
+```{r}
+ggplot(food_consumption, aes(co2_emission)) +
+  geom_histogram() +
+  facet_wrap(~ food_category) #not sure what this is still, some way to make multiple graphs based on type of food
+```
+
+```{r}
+food_consumption
+```
+
+```{r}
+emissions_by_country <- food_consumption %>%
+  group_by(country) %>%
+  summarize(total_emission = sum(co2_emission))
+
+emissions_by_country
+```
+
+```{r}
+q1 <- quantile(emissions_by_country$total_emission, .25)
+q3 <- quantile(emissions_by_country$total_emission, .75)
+iqr <- q3 - q1
+q1
+```
+
+```{r}
+lower <- q1 - 1.5 * iqr
+upper <- q3 + 1.5 * iqr
+```
+
+```{r}
+emissions_by_country %>%
+  filter(total_emission < lower | total_emission > upper)
+```
+
+```{r}
+amir_deals
+```
+
+```{r}
+amir_deals %>%
+  count(product) %>%
+  mutate(prob = n/sum(n))
+```
+
+```{r}
+set.seed(31)
+
+amir_deals %>%
+  sample_n(5)
+```
+
+```{r}
+set.seed(31)
+
+amir_deals %>%
+  sample_n(5, replace = TRUE)
+```
+
+```{r}
+#imagine this is working, they wont let me fucking download the df, this is on DISCRETE DISTRIBUTIONS, picture of what DF looks like on ipad
+ggplot(restaurant_groups, aes(group_size)) +
+  geom_histogram(bins = 5)
+
+size_distribution <- restaurant_groups %>%
+  count(group_size) %>%
+  mutate(probability = n / sum(n))
+
+expected_val <- sum(size_distribution$group_size * size_distribution$probability)
+```
+
+```{r}
+#prob of picking group of 4 or more
+size_distribution %>%
+  filter(group_size >= 4) %>%
+  summarize(prob_4_or_more = sum(probability))
+```
+
+
+
+```{r}
+punif(7, min = 0, max = 12) #prob of waiting less than or equal to 7
+```
+
+```{r}
+punif(7, min = 0, max = 12, lower.tail = FALSE) #prob of more than or equal to 7
+```
+
+```{r}
+punif(7, min = 0, max = 12) - punif(4, min = 0, max = 12) #prob 4-7
+```
+
+```{r}
+min <- 0
+max <- 30
+```
+
+```{r}
+prob_less_than_5 <- punif(5, min = 0, max = 12)
+```
+
+```{r}
+prob_greater_than_5 <- punif(5, min, max, lower.tail = FALSE)
+```
+
+```{r}
+prob_between_10_20 <- punif(20, min, max) - punif(10, min, max)
+```
+
+```{r}
+set.seed(334)
+```
+
+```{r}
+wait_times %>%
+  mutate(time = runif(1000, min = 0, max = 30)) #generating 1000 wait times between 0 and 30
+
+ggplot(aes(time)) +
+  geom_histogram(bins = 30)
+```
+
+```{r}
+# rbinom(# of trials, # of coins, # probability of heads/success)
+```
+
+
+```{r}
+coin_outcomes <- rbinom(100000, 1, 0.5)
+```
+
+```{r}
+coin_outcomes <- rbinom(100000, 1, 0.5) #me messing around, not related
+hist(coin_outcomes) #does this use ggplot?
+```
+
+```{r}
+#me messing around, not related
+ggplot(data = data.frame(outcomes = coin_outcomes), aes(x = outcomes)) +
+  geom_histogram()
+
+#The data argument specifies the data frame where the outcomes variable is stored, and the aes function defines the aesthetic mappings. In this case, x = outcomes specifies that the outcomes variable should be plotted on the x-axis.
+#shocking that it knows what to do with 
+```
+
+```{r}
+rbinom(8, 1, 0.5)
+```
+
+```{r}
+rbinom(10, 3, 0.5) #represents the total number of heads from each flip, 10 flips, 3 coins, each coin is flipped 3 times...
+```
+
+```{r}
+rbinom(10, 3, .25)
+```
+
+```{r}
+#dbinom(num heads, num trials, prob of heads)
+dbinom(7, 10, .5) #this is looking for the probability of getting heads 7times out of 10
+```
+
+```{r}
+pbinom(7, 10, 0.5) #probability of 7 or fewer heads
+```
+
+```{r}
+pbinom(7, 10, 0.5, lower.tail = FALSE) #p(heads > 7)
+```
+
+```{r}
+set.seed(10)
+
+rbinom(1, 1, .3) #single deal simulation
+```
+
+```{r}
+rbinom(1, 3, .3)
+```
+
+```{r}
+set.seed(10)
+
+deals <- rbinom(52, 3, .3)
+
+mean(deals)
+```
+
+```{r}
+dbinom(3, 3, .3) #prob of 3/3
+```
+
+```{r}
+pbinom(1, 3, .3) #prob less than one deal
+```
+
+```{r}
+pbinom(1, 3, .3, lower.tail = FALSE) #prob of more than one deal
+```
+
+```{r}
+won_30pct <- 3 * .3
+won_25pct <- 3 * .25
+won_35pct <- 3 * .35
+```
+
+NORMAL DISTR
+
+```{r}
+pnorm(154, mean = 161, sd = 7) #area of normal distr less than number, 154 in this case, percent of x lower than 154
+```
+
+```{r}
+pnorm(154, mean = 161, sd = 7, lower.tail = FALSE) #inverse of above
+```
+
+```{r}
+pnorm(157, mean = 161, sd = 7) - pnorm(154, mean = 161, sd = 7) #prob of between 154-157
+```
+
+```{r}
+qnorm(.9, mean = 161, sd = 7) #what x is 90% less than, 90% is less than 169
+```
+
+```{r}
+qnorm(.9, mean = 161, sd = 7, lower.tail = FALSE) #inverse of above
+```
+
+```{r}
+rnorm(10, mean = 161, sd = 7) # 10 random from the normal distr
+```
+
+```{r}
+ggplot(amir_deals, aes(amount)) +
+  geom_histogram(bins = 10)
+```
+
+```{r}
+pnorm(7500, mean = 5000, sd = 2000)
+```
+
+```{r}
+pnorm(1000, mean = 5000, sd = 2000, lower.tail = FALSE)
+```
+
+```{r}
+pnorm(7000, mean = 5000, sd = 2000) - pnorm(3000, mean = 5000, sd = 2000)
+```
+
+```{r}
+qnorm(.75, mean = 5000, sd = 2000, lower.tail = FALSE) #75% of sales will be more than
+```
+
+```{r}
+new_mean <- 1.2 * 5000
+new_sd <- 1.3 * 2000
+```
+
+```{r}
+new_sales <- new_sales %>% #this is what they gave and its just WRONG
+  mutate(amount = rnorm(36, mean = new_mean, sd = new_sd))
+```
+
+```{r}
+ggplot(new_sales, aes(amount)) + #shit dont work
+  geom_histogram(bins = 10)
+```
+
+```{r}
+pnorm(1000, mean = 5000, sd = 2000)
+```
+
+```{r}
+pnorm(1000, mean = 6000, sd = 2600)
+```
+
+```{r}
+die <- c(1, 2, 3, 4, 5, 6)
+sample_of_5 <- sample(die, 5, replace = TRUE) #samples from vector rather than df (sample_n)
+sample_of_5
+```
+
+```{r}
+mean(sample_of_5)
+```
+
+```{r}
+sample(die, 5, replace = TRUE) %>%
+  mean()
+```
+
+```{r}
+sample_means <- replicate(1000, sample(die, 5, replace = TRUE) %>%
+  mean()) #10 diff sample means, be sure to include pipe and mean in parenthesis
+
+sample_means #proof of CLT
+```
+
+```{r}
+ggplot(data = data.frame(sample_means), aes(x = sample_means)) +
+  geom_histogram()
+```
+
+```{r}
+sample_sd <- replicate(1000, sample(die, 5, replace = TRUE) %>%
+  sd()) #sd instead of means
+```
+
+```{r}
+ggplot(data = data.frame(sample_sd), aes(x = sample_sd)) +
+  geom_histogram()
+```
+
+```{r}
+mean(sample_means)
+```
+
+```{r}
+mean(sample_sd)
+```
+
+```{r}
+ggplot(amir_deals, aes(num_users)) +
+  geom_histogram(bins = 10)
+```
+
+```{r}
+set.seed(104)
+
+sample(amir_deals$num_users, 20, replace = TRUE) %>% #pay special attention to ad$nu... $$$$$$$$
+  mean()
+```
+
+```{r}
+sample_means <- replicate(100, sample(amir_deals$num_users, 20, replace = TRUE) %>%
+  mean())
+```
+
+```{r}
+ggplot(data = data.frame(sample_means), aes(x = sample_means)) +
+  geom_histogram(bins = 10) #figured this out myself, datacamp some bums
+```
+
+```{r}
+set.seed(321)
+
+sample_means <- replicate(30, sample(amir_deals$num_users, 20) %>%
+                            mean())
+mean(sample_means)
+
+mean(amir_deals$num_users)
+```
+
+poisson, lambda is expected value, distr peak is at lambda
+
+```{r}
+dpois(5, lambda = 8) #average is 8, what is P(5)
+```
+
+```{r}
+ppois(5, lambda = 8) #P(<= 5)
+```
+
+```{r}
+ppois(5, lambda = 8, lower.tail = FALSE)
+```
+
+```{r}
+rpois(10, lambda = 8) #sample from poisson distr, CLT still applies
+```
+
+```{r}
+dpois(5, lambda = 4)
+```
+
+```{r}
+ppois(2, lambda = 4)
+```
+
+```{r}
+ppois(10, lambda = 4, lower.tail = FALSE)
+```
+
+exponential distr, lambda = rate, continuous
+
+```{r}
+pexp(1, rate = 0.5) #P(less than a minute given rate is .5/min)
+```
+
+```{r}
+pexp(4, rate = .5, lower.tail = FALSE) #P(waiting more than 4 min, given rate is .5/min)
+```
+
+```{r}
+pexp(4, rate = .5) - pexp(1, rate = .5) #P(btwn 1 and 4)
+```
+
+1 / lambda = expected value for exp distr
+
+t distr, thicker tails than normal, more likely further from mean, degrees of freedom
+
+log normal distr, skewed distr
+
+practice:
+```{r}
+pexp(1, rate = 1/2.5) #prob amir takes less than an hour to respond to lead, av=2.5
+```
+
+```{r}
+pexp(4, rate = 1/2.5, lower.tail = FALSE)
+```
+
+```{r}
+pexp(4, rate = 1/2.5) - pexp(3, rate = 1/2.5) #between 3 and 4 hrs
+```
+
+CORRELATION
+
+Pearson product-moment correlation
+
+```{r}
+ggplot(df, aes(x, y)) +   #base model for visualizing relationships via scatter plots
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) #added trend line, lm = linear trend line, se false means no error margins
+```
+
+```{r}
+cor(df$x, df$y)       #computing correlations, order doesn't matter, missing values means NA
+```
+
+```{r}
+cor(df$x, df$y, use = "pairwise.complete.obs")     #to ignore missing values
+```
+
+
+
+```{r}
+ggplot(world_happiness_sugar, aes(life_exp, happiness_score)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+cor(world_happiness_sugar$life_exp, world_happiness_sugar$happiness_score)
+```
+
+```{r}
+cor(msleep$bodywt, msleep$awake)
+```
+
+LOG TRANSFORMATIONS, for skewed data
+
+```{r}
+msleep %>%
+  mutate(log_bodywt = log(bodywt)) %>%
+  ggplot(aes(log_bodywt, awake)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+cor(msleep$log_bodywt, msleep$awake) #didnt work...
+```
+
+
+```{r}
+msleep_modified <- msleep %>%
+  mutate(log_bodywt = log(bodywt)) %>% #CHAT GPT ADVICE, normal thing didnt work
+  {cor(.$log_bodywt, .$awake)}
+```
+
+```{r}
+msleep_modified
+```
+
+log(x)
+sqrt(x)
+1/x (reciprocal)
+combinations of these things for x and y
+
+correlation doesnt imply causation
+
+
+CONFOUNDING VARS, association vs causation
+```{r}
+ggplot(world_happiness_sugar, aes(gdp_per_cap, life_exp)) +
+  geom_point() 
+```
+
+```{r}
+cor(world_happiness_sugar$gdp_per_cap, world_happiness_sugar$life_exp)
+```
+
+```{r}
+ggplot(world_happiness_sugar, aes(happiness_score, gdp_per_cap)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+```{r}
+cor(world_happiness_sugar$happiness_score, world_happiness_sugar$gdp_per_cap)
+```
+
+
+
+```{r}
+world_happiness <- world_happiness_sugar %>%
+  mutate(log_gdp_per_cap = log(gdp_per_cap))
+```
+
+```{r}
+ggplot(world_happiness, aes(happiness_score, log_gdp_per_cap)) +
+  geom_point()
+```
+
+```{r}
+cor(world_happiness$log_gdp_per_cap, world_happiness$happiness_score)
+```
+
+```{r}
+ggplot(world_happiness_sugar, aes(grams_sugar_per_day, happiness_score)) +
+  geom_point()
+```
+
+```{r}
+cor(world_happiness_sugar$grams_sugar_per_day, world_happiness_sugar$happiness_score)
+```
+
+Designs of experiments
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
