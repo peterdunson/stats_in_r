@@ -358,7 +358,7 @@ won_25pct <- 3 * .25
 won_35pct <- 3 * .35
 ```
 
-NORMAL DISTR
+#NORMAL DISTR
 
 ```{r}
 pnorm(154, mean = 161, sd = 7) #area of normal distr less than number, 154 in this case, percent of x lower than 154
